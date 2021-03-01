@@ -1,0 +1,13 @@
+[neovim]
+- version == 0.4
+- package manager
+    - python3
+- pip
+    - pynvim
+
+[plugin]
+- package manager
+    - ctags (tagbar)
+- package manager (optional)
+    - clang-format (ale)
+    - clang-tidy (ale)
