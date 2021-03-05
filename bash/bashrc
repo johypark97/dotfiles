@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# if not running interactively, don't do anything
+[[ -z $PS1 ]] && return
+
+# ===============================
+# -------- source script --------
+# ===============================
+
+function sourceScript()
+{
+    if [[ -f $1/$2 ]]; then
+        source "$1/$2"
+    else
+        echo "sourceScript() failed: cannot find $2"
+    fi
+}
+
+scriptRoot=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
+export DOTFILES_ROOT=$( dirname "$scriptRoot" )
+sourceScript "$scriptRoot" script/completion
+sourceScript "$scriptRoot" script/function
+sourceScript "$scriptRoot" script/config
+sourceScript "$scriptRoot" script/alias
+unset scriptRoot
