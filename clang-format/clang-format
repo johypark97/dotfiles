@@ -1,0 +1,23 @@
+# clang version: 10.0.0
+# https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+
+Language: Cpp
+BasedOnStyle: Google
+
+AccessModifierOffset: -4
+AlignConsecutiveMacros: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Allman
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+IncludeBlocks: Preserve
+IndentCaseLabels: false
+IndentGotoLabels: false
+IndentWidth: 4
+PointerAlignment: Right
+SpacesBeforeTrailingComments: 1
+SpacesInContainerLiterals: false
