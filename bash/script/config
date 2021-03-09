@@ -5,8 +5,7 @@
 # ========================
 
 # prompt
-export PROMPT_COMMAND=promptCommandFunction
-export PS1=$( parsePrompt "<<1;32>>[\u@\h]<<0>>:<<1;34>>\w<<0>>\\$ " $( isColorTerminal ) )
+setPrompt
 
 # shell option
 HISTCONTROL=ignoreboth

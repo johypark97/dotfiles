@@ -20,6 +20,7 @@ scriptRoot=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
 export DOTFILES_ROOT=$( dirname "$scriptRoot" )
 sourceScript "$scriptRoot" script/completion
 sourceScript "$scriptRoot" script/function
+sourceScript "$scriptRoot" script/prompt
 sourceScript "$scriptRoot" script/config
 sourceScript "$scriptRoot" script/alias
 unset scriptRoot

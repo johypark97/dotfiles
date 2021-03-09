@@ -4,22 +4,6 @@
 # -------- function --------
 # ==========================
 
-# https://stackoverflow.com/a/5032641
-function strIndex()
-{
-    local x=${1%%$2*}
-    [[ $x == $1 ]] && echo -1 || echo "${#x}"
-}
-
-# https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt
-# https://en.wikipedia.org/wiki/ANSI_escape_code
-# "\[" == "\001", "\]" == "\002", "\e" == "\033"
-function wrapSGR()
-{
-    local IFS=$';'
-    echo "\001\033[$*m\002"
-}
-
 function exportPath()
 {
     local i
@@ -27,79 +11,4 @@ function exportPath()
         [[ $PATH =~ $i ]] || PATH=$i:$PATH
     done
     export PATH
-}
-
-function getGitRepositoryPath()
-{
-    local path=$( pwd -P )
-    while [[ $path != / ]]; do
-        if [[ -d $path/.git ]]; then
-            echo "$path"
-            break
-        fi
-        path=$( dirname "$path" )
-    done
-
-    if command -v git > /dev/null; then
-        echo "$( git rev-parse --show-toplevel 2>/dev/null )"
-    else
-        local path=$( pwd -P )
-        while [[ $path != / ]]; do
-            if [[ -d $path/.git ]]; then
-                echo "$path"
-                break
-            fi
-            path=$( dirname "$path" )
-        done
-    fi
-}
-
-function parsePrompt()
-{
-    local prompt=$1         # string
-    local enableSGR=${2:-0} # bool (1 or 0)
-    local tagOpen=${3:-<<}  # string
-    local tagClose=${4:->>} # string
-
-    while :; do
-        local begin=$( strIndex "$prompt" "$tagOpen" )
-        (( begin == -1 )) && break
-
-        local endOffset=$( strIndex "${prompt:$(( begin + 1 ))}" "$tagClose" )
-        (( endOffset == -1 )) && break
-
-        local tag=${prompt:$begin:$(( endOffset + ${#tagClose} + 1 ))}
-        local data=${tag:$(( ${#tagOpen} )):$(( endOffset - ${#tagOpen} + 1 ))}
-        (( enableSGR )) && data=$( wrapSGR "$data" ) || data=""
-
-        prompt=${prompt//$tag/$data}
-    done
-
-    echo "$prompt"
-}
-
-function isColorTerminal()
-{
-    local ret=0
-    case $TERM in
-        xterm-color | *-256color)
-            ret=1
-            ;;
-        *)
-            if [[ -x /usr/bin/tput ]] && tput setaf 1 > /dev/null; then
-                ret=1
-            fi
-            ;;
-    esac
-    echo "$ret"
-}
-
-function promptCommandFunction()
-{
-    local path=$( getGitRepositoryPath )
-    if [[ -n $path ]]; then
-        path=$( basename "$path" )
-        local branch=$( git rev-parse --abbrev-ref HEAD 2>/dev/null )
-        echo -en "$( parsePrompt "<<1;31>>{$path/$branch}" $( isColorTerminal ) )"
-    fi
 }

@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# ========================
+# -------- prompt --------
+# ========================
+
+# https://stackoverflow.com/a/5032641
+function strIndex()
+{
+    local x=${1%%$2*}
+    [[ $x == $1 ]] && echo -1 || echo "${#x}"
+}
+
+# https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt
+# https://en.wikipedia.org/wiki/ANSI_escape_code
+# "\[" == "\001", "\]" == "\002", "\e" == "\033"
+function wrapSGR()
+{
+    local IFS=$';'
+    echo "\001\033[$*m\002"
+}
+
+function parseTag()
+{
+    local data=$1           # string
+    local callback=$2       # string (function name)
+    local tagOpen=${3:-<<}  # string
+    local tagClose=${4:->>} # string
+
+    local ret
+    local i=0
+    while :; do
+        local begin=$( strIndex "${data:$i}" "$tagOpen" )
+        (( begin == -1 )) && break || (( begin += i ))
+
+        local endOffset=$( strIndex "${data:$(( begin + 1 ))}" "$tagClose" )
+        (( endOffset == -1 )) && break
+
+        local tag=${data:$begin:$(( endOffset + ${#tagClose} + 1 ))}
+        local value
+        if [[ -n $callback ]]; then
+            value=${tag:${#tagOpen}:$(( endOffset - ${#tagOpen} + 1 ))}
+            value=$( "$callback" "$value" )
+        fi
+
+        ret=$ret${data:$i:$(( begin - i ))}$value
+        (( i = begin + ${#tag} ))
+    done
+
+    ret=$ret${data:$i}
+    echo "$ret"
+}
+
+function promptParseTagCallback()
+{
+    local type=${1::1}
+    local value=${1:1}
+    case $type in
+        c)
+            (( DOTFILES_FLAG_PROMPT_SGR )) && echo "$( wrapSGR "$value" )"
+            ;;
+        u)
+            local delimiter=${value::1}
+            value=${value:1}
+            if (( DOTFILES_FLAG_PROMPT_UTF8 )); then
+                echo -e "${value%%$delimiter*}"
+            elif [[ $value =~ $delimiter ]]; then
+                echo "${value#*$delimiter}"
+            fi
+            ;;
+        \\)
+            echo -e "\\$value"
+            ;;
+        *)
+            echo "[ERROR]"
+            ;;
+    esac
+}
+
+function getGitRepositoryPath()
+{
+    if command -v git > /dev/null; then
+        echo "$( git rev-parse --show-toplevel 2>/dev/null )"
+    else
+        local path=$( pwd -P )
+        while [[ $path != / ]]; do
+            if [[ -d $path/.git ]]; then
+                echo "$path"
+                break
+            fi
+            path=$( dirname "$path" )
+        done
+    fi
+}
+
+function promptCommandFunction()
+{
+    local path=$( getGitRepositoryPath )
+    if [[ -n $path ]]; then
+        path=$( basename "$path" )
+
+        local prompt
+        prompt+=$DOTFILES_PROMPT_CMD_PREFIX
+        prompt+=$path
+
+        if command -v git > /dev/null; then
+            local branch=$( git rev-parse --abbrev-ref HEAD 2>/dev/null )
+            if [[ -n $branch ]]; then
+                prompt+=$DOTFILES_PROMPT_CMD_BRANCH
+                prompt+=$branch
+            fi
+        fi
+
+        prompt+=$DOTFILES_PROMPT_CMD_SUFFIX
+        echo -e "$prompt"
+    fi
+}
+
+function setPrompt()
+{
+    local isColorTerminal=0
+    if [[ $TERM =~ (xterm-color|.*-256color) ]]; then
+        isColorTerminal=1
+    elif [[ -x /usr/bin/tput ]] && tput setaf 1 > /dev/null; then
+        isColorTerminal=1
+    fi
+    export DOTFILES_FLAG_PROMPT_SGR=$isColorTerminal
+
+    local isUTF8Lang=0
+    [[ ${LANG,,} =~ .*\.utf-?8$ ]] && isUTF8Lang=1
+    export DOTFILES_FLAG_PROMPT_UTF8=$isUTF8Lang
+
+    export PS1=$( parseTag "<<c1;32>>[\u@\h]<<c0>>:<<c1;34>>\w<<c0>>\\$ " promptParseTagCallback )
+    export DOTFILES_PROMPT_CMD_PREFIX=$( parseTag "<<c1;31>><<u/\u27EA /{>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_CMD_BRANCH=$( parseTag "<<u/ \u00BB //>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_CMD_SUFFIX=$( parseTag "<<u/ \u27EB/}>><<c0>>" promptParseTagCallback )
+    PROMPT_COMMAND=promptCommandFunction
+}
