@@ -95,25 +95,39 @@ function getGitRepositoryPath()
 
 function promptCommandFunction()
 {
+    local prompt
+
+    # info (group and umask)
+    (( $( id -u ) != $( id -g ) )) && prompt+=$( id -gn )
+
+    local umaskValue=$( umask )
+    if (( DOTFILES_UMASK_DEFAULT != umaskValue )); then
+        [[ -n $prompt ]] && prompt+=$DOTFILES_PROMPT_INFO_SEPARATOR
+        prompt+="${umaskValue:1}($DOTFILES_UMASK_DEFAULT)"
+    fi
+
+    [[ -n $prompt ]] && prompt=$DOTFILES_PROMPT_INFO_PREFIX$prompt$DOTFILES_PROMPT_INFO_SUFFIX
+
+    # git
     local path=$( getGitRepositoryPath )
     if [[ -n $path ]]; then
         path=$( basename "$path" )
 
-        local prompt
-        prompt+=$DOTFILES_PROMPT_CMD_PREFIX
+        prompt+=$DOTFILES_PROMPT_GIT_PREFIX
         prompt+=$path
 
         if command -v git > /dev/null; then
             local branch=$( git rev-parse --abbrev-ref HEAD 2>/dev/null )
             if [[ -n $branch ]]; then
-                prompt+=$DOTFILES_PROMPT_CMD_BRANCH
+                prompt+=$DOTFILES_PROMPT_GIT_SEPARATOR
                 prompt+=$branch
             fi
         fi
 
-        prompt+=$DOTFILES_PROMPT_CMD_SUFFIX
-        echo -e "$prompt"
+        prompt+=$DOTFILES_PROMPT_GIT_SUFFIX
     fi
+
+    [[ -n $prompt ]] && echo -e "$prompt"
 }
 
 function setPrompt()
@@ -131,8 +145,11 @@ function setPrompt()
     export DOTFILES_FLAG_PROMPT_UTF8=$isUTF8Lang
 
     export PS1=$( parseTag "<<c1;32>>[\u@\h]<<c0>>:<<c1;34>>\w<<c0>>\\$ " promptParseTagCallback )
-    export DOTFILES_PROMPT_CMD_PREFIX=$( parseTag "<<c1;31>><<u/\u27EA /{>>" promptParseTagCallback )
-    export DOTFILES_PROMPT_CMD_BRANCH=$( parseTag "<<u/ \u00BB //>>" promptParseTagCallback )
-    export DOTFILES_PROMPT_CMD_SUFFIX=$( parseTag "<<u/ \u27EB/}>><<c0>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_INFO_PREFIX=$( parseTag "<<c1;33>><<u/\u27E8 /[>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_INFO_SEPARATOR=$( parseTag "<<u/ \u2022 /:>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_INFO_SUFFIX=$( parseTag "<<u/ \u27E9/]>><<c0>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_GIT_PREFIX=$( parseTag "<<c1;31>><<u/\u27EA /{>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_GIT_SEPARATOR=$( parseTag "<<u/ \u00BB //>>" promptParseTagCallback )
+    export DOTFILES_PROMPT_GIT_SUFFIX=$( parseTag "<<u/ \u27EB/}>><<c0>>" promptParseTagCallback )
     PROMPT_COMMAND=promptCommandFunction
 }
