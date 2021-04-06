@@ -11,6 +11,9 @@ umask $DOTFILES_UMASK_DEFAULT
 # prompt
 setPrompt
 
+# npm
+setNpmPrefix "$HOME/.npm_global"
+
 # shell option
 HISTCONTROL=ignoreboth
 HISTFILESIZE=4096
