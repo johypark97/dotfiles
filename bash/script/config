@@ -11,6 +11,9 @@ umask $DOTFILES_UMASK_DEFAULT
 # prompt
 setPrompt
 
+# path
+exportPath "$HOME/.local/bin"
+
 # npm
 setNpmPrefix "$HOME/.npm_global"
 
