@@ -12,11 +12,3 @@ function exportPath()
     done
     export PATH
 }
-
-function setNpmPrefix()
-{
-    if command -v npm > /dev/null; then
-        [[ ! -f $HOME/.npmrc ]] && npm config set prefix "$1"
-        exportPath "$1/bin"
-    fi
-}
