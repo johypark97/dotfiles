@@ -23,5 +23,7 @@ shopt -s histappend
 export GCC_COLORS="error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01"
 
 # path
-exportPath "$HOME/.local/bin"
-command -v npm > /dev/null && exportPath "$( npm config get prefix )/bin"
+if [[ $OSTYPE == linux-gnu ]]; then
+    exportPath "$HOME/.local/bin"
+    command -v npm > /dev/null && exportPath "$( npm config get prefix )/bin"
+fi
