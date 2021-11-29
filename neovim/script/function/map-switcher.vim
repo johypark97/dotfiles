@@ -4,109 +4,165 @@
 
 " -------- private --------
 
-function! s:checkVariable()
-    let l:prefix = 'g:MapSwitcher_'
-    for i in ['executor', 'index', 'mapTable']
-        if !exists(l:prefix . i)
-            throw l:prefix . i . ' is not defined'
+let s:executor = v:null
+let s:index = 0
+let s:mapTable = []
+
+function! s:throwException(format, ...)
+    throw call(function('printf'), extend(['MapSwitcher: ' . a:format], a:000))
+endfunction
+
+function! s:isReady()
+    if s:executor == v:null
+        call s:throwException('executor is not defined')
+    endif
+
+    if empty(s:mapTable)
+        call s:throwException('map table is not defined')
+    endif
+endfunction
+
+function! s:checkMapTable(value)
+    " check presets
+    for i in a:value
+        " check name and map is defined in preset
+        for testKey in ['name', 'mapping']
+            if !has_key(i, testKey)
+                call s:throwException("'%s' is not defined in the map table", testKey)
+            endif
+        endfor
+
+        " check mapping of preset
+        for [key, value] in items(i.mapping)
+            " check isNore, isSilent, and rhs is defined in each key
+            for testKey in ['isNore', 'isSilent', 'rhs']
+                if !has_key(value, testKey)
+                    call s:throwException("'%s' is not defined in key '%s' of '%s'", testKey, key, i.name)
+                endif
+            endfor
+        endfor
+    endfor
+endfunction
+
+function! s:map()
+    let l:keys = []
+    for i in s:mapTable
+        for j in keys(i.mapping)
+            if index(l:keys, j) == -1
+                call add(l:keys, j)
+            endif
+        endfor
+    endfor
+    let l:keys = sort(l:keys)
+
+    for i in l:keys
+        let l:newRhs = ":call MapSwitcher_key('" . substitute(i, '<', '<lt>', 'g') . "')<CR>"
+
+        " maparg(i, 'n') converts the <> notation and cause the map fails
+        let l:mappedRhs = get(maparg(i, 'n', 0, 1), 'rhs', v:null)
+        if empty(l:mappedRhs)
+            execute 'nnoremap <unique> <silent>' i l:newRhs
+        elseif l:mappedRhs !=# l:newRhs
+            call s:throwException('cannot map to %s (%s)', i, l:mappedRhs)
         endif
     endfor
 endfunction
 
-function! s:getRhs(key)
-    return ":call MapSwitcher_key('" . substitute(a:key, '<', '<lt>', 'g') . "')<CR>"
-endfunction
-
 " -------- public --------
 
-function! g:MapSwitcher_map()
-    let g:MapSwitcher_index = 0
+function! g:MapSwitcher_newMapTable(...)
+    let l:temp = []
+    for i in a:000
+        call add(l:temp, i)
+    endfor
+    return l:temp
+endfunction
 
+function! g:MapSwitcher_newPreset(name, ...)
+    let l:temp = { 'name': a:name, 'mapping': {} }
+    for i in a:000
+        call extend(l:temp.mapping, i)
+    endfor
+    return l:temp
+endfunction
+
+function! g:MapSwitcher_newKey(key, isNore, isSilent, rhs)
+    return { a:key: { 'isNore': a:isNore, 'isSilent': a:isSilent, 'rhs': a:rhs } }
+endfunction
+
+function! g:MapSwitcher_init(executor, mapTable)
     try
-        call s:checkVariable()
+        call s:checkMapTable(a:mapTable)
     catch /.*/
         echoerr v:exception
         return
     endtry
 
-    let l:key = {}
-    for i in g:MapSwitcher_mapTable
-        for j in keys(i.map)
-            call extend(l:key, { j: v:null })
-        endfor
-    endfor
-    let l:key = sort(keys(l:key))
+    let s:executor = a:executor
+    let s:mapTable = a:mapTable
 
-    for i in l:key
-        " maparg(i, 'n') converts the <> notation and cause the map fails
-        let l:temp = get(maparg(i, 'n', 0, 1), 'rhs', '')
-        if l:temp ==# ''
-            execute 'nnoremap <unique> <silent>' i s:getRhs(i)
-        elseif l:temp !=# s:getRhs(i)
-            echoerr 'MapSwitcher_map() failed: cannot map to' i '(' l:temp ')'
-        endif
+    try
+        call s:map()
+    catch /.*/
+        echoerr v:exception
+        return
+    endtry
+endfunction
+
+function! g:MapSwitcher_help()
+    try
+        call s:isReady()
+    catch /.*/
+        echoerr v:exception
+        return
+    endtry
+
+    let l:preset = s:mapTable[s:index]
+    let l:length = max(map(keys(l:preset.mapping), 'strlen(v:val)'))
+
+    echo '[' l:preset.name ']'
+    for [key, value] in items(l:preset.mapping)
+        echo printf('%*s: %s', l:length, key, value.rhs)
     endfor
 endfunction
 
 function! g:MapSwitcher_switch()
     try
-        call s:checkVariable()
+        call s:isReady()
     catch /.*/
         echoerr v:exception
         return
     endtry
 
-    let g:MapSwitcher_index += 1
-    if g:MapSwitcher_index >= len(g:MapSwitcher_mapTable)
-        let g:MapSwitcher_index = 0
+    let l:length = len(s:mapTable)
+
+    let s:index += 1
+    if s:index >= l:length
+        let s:index = 0
     endif
 
-    let l:index = 'g:MapSwitcher_index'
-    let l:table = 'g:MapSwitcher_mapTable'
-    echo printf('MapSwitcher(%d/%d): %s', {l:index} + 1, len({l:table}), {l:table}[{l:index}].name)
-endfunction
-
-function! g:MapSwitcher_help()
-    try
-        call s:checkVariable()
-    catch /.*/
-        echoerr v:exception
-        return
-    endtry
-
-    let l:index = 'g:MapSwitcher_index'
-    let l:table = 'g:MapSwitcher_mapTable'
-
-    let l:currentMap = {l:table}[{l:index}]
-    let l:keyStringLength = max(map(keys(l:currentMap.map), 'strlen(v:val)'))
-
-    echo '[' l:currentMap.name ']'
-    for [key, value] in items(l:currentMap.map)
-        echo printf('%*s: %s', l:keyStringLength, key, value.rhs)
-    endfor
+    echo printf('MapSwitcher(%d/%d): %s', s:index + 1, l:length, s:mapTable[s:index].name)
 endfunction
 
 function! g:MapSwitcher_key(key)
     try
-        call s:checkVariable()
+        call s:isReady()
     catch /.*/
         echoerr v:exception
         return
     endtry
 
-    let l:index = 'g:MapSwitcher_index'
-    let l:table = 'g:MapSwitcher_mapTable'
-    let l:function = get({l:table}[{l:index}].map, a:key, {})
-
+    let l:function = get(s:mapTable[s:index].mapping, a:key, v:null)
     if !empty(l:function)
-        let l:command = l:function.isNore ? 'nnoremap' : 'nmap'
-        let l:command .= ' <buffer>'
-        let l:command .= l:function.isSilent ? ' <silent>' : ''
-        let l:command .= ' ' . g:MapSwitcher_executor
-        let l:command .= ' ' . l:function.rhs
-        execute l:command
+        let l:command = []
+        call add(l:command, l:function.isNore ? 'nnoremap' : 'nmap')
+        call add(l:command, '<buffer>')
+        call add(l:command, l:function.isSilent ? '<silent>' : '')
+        call add(l:command, s:executor)
+        call add(l:command, l:function.rhs)
+        execute join(l:command)
 
-        let l:key = '"' . escape(g:MapSwitcher_executor, '<') . '"'
-        execute 'normal' eval(l:key)
+        let l:executor = '"' . escape(s:executor, '<') . '"'
+        call feedkeys(eval(l:executor))
     endif
 endfunction

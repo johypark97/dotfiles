@@ -95,29 +95,21 @@ cnoremap <expr> <Right> wildmenumode() ? ' <BS><C-Z>' : '<Right>'
 " -------- mappping - MapSwitcher --------
 " ========================================
 
-let g:MapSwitcher_executor = '<M-Bslash>'
-let g:MapSwitcher_mapTable = [
-    \ {
-        \ 'name': 'default',
-        \ 'map': {
-            \ '<F8>':         { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>NERDTreeToggle<CR>'         },
-            \ '<Leader><F8>': { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>NERDTreeVCS<CR>'            },
-            \ '<F9>':         { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>Tagbar<CR>'                 },
-            \ '<F10>':        { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>call b:toggler.git()<CR>'   },
-            \ '<F11>':        { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>call b:toggler.guide()<CR>' },
-        \ },
-    \ },
-    \ {
-        \ 'name': 'color',
-        \ 'map': {
-            \ '<F9>':  { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>call Init_changeGruvboxBackground()<CR>' },
-            \ '<F10>': { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>call Init_changeGruvboxContrast()<CR>'   },
-            \ '<F11>': { 'isNore': 1, 'isSilent': 1, 'rhs': '<Cmd>call Init_cycleGruvboxColor()<CR>'       },
-        \ },
-    \ },
-\ ]
+call MapSwitcher_init('<M-Bslash>', MapSwitcher_newMapTable(
+    \ MapSwitcher_newPreset('default',
+        \ MapSwitcher_newKey('<F8>',         1, 1, '<Cmd>NERDTreeToggle<CR>'),
+        \ MapSwitcher_newKey('<Leader><F8>', 1, 1, '<Cmd>NERDTreeVCS<CR>'),
+        \ MapSwitcher_newKey('<F9>',         1, 1, '<Cmd>Tagbar<CR>'),
+        \ MapSwitcher_newKey('<F10>',        1, 1, '<Cmd>call b:toggler.git()<CR>'),
+        \ MapSwitcher_newKey('<F11>',        1, 1, '<Cmd>call b:toggler.guide()<CR>')
+    \ ),
+    \ MapSwitcher_newPreset('color',
+        \ MapSwitcher_newKey('<F9>',  1, 1, '<Cmd>call Init_changeGruvboxBackground()<CR>'),
+        \ MapSwitcher_newKey('<F10>', 1, 1, '<Cmd>call Init_changeGruvboxContrast()<CR>'),
+        \ MapSwitcher_newKey('<F11>', 1, 1, '<Cmd>call Init_cycleGruvboxColor()<CR>')
+    \ )
+\ ))
 
-call MapSwitcher_map()
 nnoremap <silent> <Bslash><F12>    <Cmd>call MapSwitcher_switch()<CR>
 nnoremap <silent> <Bslash><Bslash> <Cmd>call MapSwitcher_help()<CR>
 autocmd BufEnter * call Init_newToggler()
