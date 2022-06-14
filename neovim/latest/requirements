@@ -1,0 +1,10 @@
+[neovim]
+- version >= 0.7
+- package manager
+    - python3
+- pip
+    - pynvim
+
+[plugin]
+- package manager
+    - ctags (tagbar)

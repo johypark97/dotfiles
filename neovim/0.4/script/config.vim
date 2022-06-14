@@ -29,6 +29,12 @@ set smartindent
 set smarttab
 
 " -------- advanced --------
+if has('nvim-0.4')
+    set listchars=tab:\ \ →,nbsp:␣,trail:•,conceal:◦,precedes:⟨,extends:⟩ " ,eol:↲
+else
+    set listchars=tab:\ →,nbsp:␣,trail:•,conceal:◦,precedes:⟨,extends:⟩ " ,eol:↲
+endif
+
 set cmdheight=2
 set colorcolumn=80
 set conceallevel=0
@@ -37,7 +43,6 @@ set ignorecase
 set incsearch
 set laststatus=2
 set list
-set listchars=tab:\ \ →,nbsp:␣,trail:•,conceal:◦,precedes:⟨,extends:⟩ " ,eol:↲
 set nobackup
 set nohidden
 set norelativenumber

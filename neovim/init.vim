@@ -9,42 +9,32 @@
 "   == &runtimepath . '/init.vim'
 "   == stdpath('config') . '/init.vim'
 
-" [vim-plug]
-" https://github.com/junegunn/vim-plug
-
-" =================================================
-" -------- vim-plug automatic installation --------
-" =================================================
-
-function! s:installVimPlug()
-    let l:path = stdpath('data') . '/site/autoload/plug.vim'
-    let l:url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    if empty(glob(l:path))
-        execute '!curl -fLo' l:path '--create-dirs' l:url
-        autocmd VimEnter * ++once PlugInstall --sync | source $MYVIMRC
-    endif
-endfunction
-
-call s:installVimPlug()
-
-" ===============================
-" -------- source script --------
-" ===============================
+" ========================
+" -------- router --------
+" ========================
 
 let s:scriptRoot = fnamemodify(resolve(expand('<sfile>')), ':p:h')
 execute 'set path+=' . s:scriptRoot
 
-function! g:Init_sourceScript(file)
+function! s:route(file)
     let l:path = findfile(a:file, s:scriptRoot)
     if empty(l:path)
-        echoerr 'Init_sourceScript() failed: cannot find' a:file
+        echoerr 'route() failed: cannot find' a:file
         return
     endif
     execute 'source' fnamemodify(l:path, ':p')
 endfunction
 
-call g:Init_sourceScript('script/function.vim')
-call g:Init_sourceScript('script/plugin.vim')
-call g:Init_sourceScript('script/mapping.vim')
-call g:Init_sourceScript('script/config.vim')
-call g:Init_sourceScript('script/command.vim')
+" =======================
+" -------- route --------
+" =======================
+
+if has('nvim-0.7')
+    call s:route('latest/init.lua')
+elseif has('nvim-0.4')
+    call s:route('0.4/init.vim')
+elseif has('nvim-0.3')
+    call s:route('0.4/init.vim')
+else
+    echoerr 'config does not support this version of neovim'
+endif
