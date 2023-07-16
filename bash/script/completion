@@ -13,6 +13,11 @@ if ! shopt -oq posix; then
     fi
 fi
 
+# git completion
+if ! command -v ___git_complete > /dev/null; then
+    [[ -e ~/.git-completion.bash ]] && source ~/.git-completion.bash
+fi
+
 # pip completion
 function _pip_completion()
 {
