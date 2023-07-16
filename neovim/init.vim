@@ -29,12 +29,8 @@ endfunction
 " -------- route --------
 " =======================
 
-if has('nvim-0.7')
-    call s:route('latest/init.lua')
-elseif has('nvim-0.4')
-    call s:route('0.4/init.vim')
-elseif has('nvim-0.3')
-    call s:route('0.4/init.vim')
+if has('nvim-0.9')
+    call s:route('0.9/init.vim')
 else
     echoerr 'config does not support this version of neovim'
 endif
