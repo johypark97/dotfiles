@@ -44,3 +44,4 @@ call g:init#sourceScript('script/plugin/nvim/mason-lspconfig.vim') " 2
 call g:plug#end()
 
 call g:postInit#run()
+call g:init#sourceScript('script/plugin/lua/lsp-setup.lua')
