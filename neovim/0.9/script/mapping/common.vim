@@ -124,4 +124,19 @@ call g:mapSwitcher#init('<M-Bslash>', g:mapSwitcher#newMapTable(
 
 nnoremap <silent> <Bslash><F12>    <Cmd>call g:mapSwitcher#switch()<CR>
 nnoremap <silent> <Bslash><Bslash> <Cmd>call g:mapSwitcher#help()<CR>
+
+" ====================================
+" -------- mappping - Toggler --------
+" ====================================
+
+function! s:toggleIndent(value)
+    let l:expr = 'require("ibl").setup_buffer(0, { enabled = _A })'
+    let l:args = a:value ? v:true : v:false
+
+    call g:luaeval(l:expr, l:args)
+endfunction
+
+call g:toggler#resetCallback()
+call g:toggler#addCallback(funcref('s:toggleIndent'))
+
 autocmd BufEnter * call g:toggler#newToggler()
