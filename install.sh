@@ -14,13 +14,13 @@ function installBashConfig()
 function installNeovimConfig()
 {
     local DIR=$HOME/.config/nvim
-    local FILE=$DIR/init.vim
+    local FILE=$DIR/init.lua
     if [[ ! -d $DIR ]]; then
         mkdir -p $DIR
     elif [[ -f $FILE ]]; then
         rm $FILE
     fi
-    ln -s $scriptRoot/neovim/init.vim $FILE
+    ln -s $scriptRoot/neovim/init.lua $FILE
 }
 
 function main()
