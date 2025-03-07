@@ -18,7 +18,7 @@ lazy.setup({
         Init.scriptLoader:dofile("script/plugin/nvim/gitsigns.lua"),
         Init.scriptLoader:dofile("script/plugin/nvim/indent-blankline.lua"),
         Init.scriptLoader:dofile("script/plugin/nvim/lualine.lua"),
-        Init.scriptLoader:dofile("script/plugin/nvim/null-ls.lua"),
+        Init.scriptLoader:dofile("script/plugin/nvim/none-ls.lua"),
         Init.scriptLoader:dofile("script/plugin/nvim/nvim-autopairs.lua"),
         Init.scriptLoader:dofile("script/plugin/nvim/nvim-cmp.lua"),
         Init.scriptLoader:dofile("script/plugin/nvim/nvim-luapad.lua"),

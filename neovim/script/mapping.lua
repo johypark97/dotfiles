@@ -62,11 +62,11 @@ vim.keymap.set("n", "<Leader>n", "<Cmd>enew<CR>")
 vim.keymap.set("n", "<Leader>l", "<Cmd>bnext<CR>")
 vim.keymap.set("n", "<Leader>h", "<Cmd>bprevious<CR>")
 
-vim.keymap.set("n", "<Leader>tt", "<Cmd>tabs<CR>")
-vim.keymap.set("n", "<Leader>tn", "<Cmd>tabnew<CR>")
-vim.keymap.set("n", "<Leader>tq", "<Cmd>tabclose<CR>")
-vim.keymap.set("n", "<Leader>tl", "gt")
-vim.keymap.set("n", "<Leader>th", "gT")
+vim.keymap.set("n", "<Leader><Tab>t", "<Cmd>tabs<CR>")
+vim.keymap.set("n", "<Leader><Tab>n", "<Cmd>tabnew<CR>")
+vim.keymap.set("n", "<Leader><Tab>q", "<Cmd>tabclose<CR>")
+vim.keymap.set("n", "<Leader><Tab>l", "gt")
+vim.keymap.set("n", "<Leader><Tab>h", "gT")
 
 vim.keymap.set("c", "<M-h>", "<Left>",  { remap = true })
 vim.keymap.set("c", "<M-j>", "<Down>",  { remap = true })
@@ -114,23 +114,23 @@ vim.lsp.buf.typehierarchy()
 vim.lsp.buf.workspace_symbol()
 ]]
 
-vim.keymap.set("n", "<M-f>", "<Cmd>lua vim.lsp.buf.format()<CR>")
+vim.keymap.set("n", "<M-f>", "<Cmd>lua vim.lsp.buf.format({ timeout_ms = 4000 })<CR>")
 
 -- ========================================
 -- -------- mappping - MapSwitcher --------
 -- ========================================
 
 Init.mapSwitcher:setExecutor("<M-Bslash>")
-Init.mapSwitcher:addKey("default",    "<F2>",    "<Cmd>lua vim.lsp.buf.rename()<CR>")
-Init.mapSwitcher:addKey("default",    "<F8>",    "<Cmd>NvimTreeToggle<CR>")
-Init.mapSwitcher:addKey("default",    "<F9>",    "<Cmd>lua vim.lsp.buf.hover()<CR>")
-Init.mapSwitcher:addKey("default",    "<C-F12>", "<Cmd>lua vim.lsp.buf.implementation()<CR>")
-Init.mapSwitcher:addKey("default",    "<S-F12>", "<Cmd>lua vim.lsp.buf.references()<CR>")
-Init.mapSwitcher:addKey("default",    "<F12>",   "<Cmd>lua vim.lsp.buf.definition()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F9>",    "<Cmd>lua Init.gruvboxColor:changeBackground()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F10>",   "<Cmd>lua Init.gruvboxColor:changeContrast()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F11>",   "<Cmd>lua Init.gruvboxColor:cycleColor()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F12>",   "<Cmd>lua Init.toggler:toggleGuide()<CR>")
+Init.mapSwitcher:addKey("default",    "<F2>",  "<Cmd>lua vim.lsp.buf.rename()<CR>")
+Init.mapSwitcher:addKey("default",    "<F8>",  "<Cmd>NvimTreeToggle<CR>")
+Init.mapSwitcher:addKey("default",    "<F9>",  "<Cmd>lua vim.lsp.buf.hover()<CR>")
+Init.mapSwitcher:addKey("default",    "<F10>", "<Cmd>lua vim.lsp.buf.references()<CR>")
+Init.mapSwitcher:addKey("default",    "<F11>", "<Cmd>lua vim.lsp.buf.implementation()<CR>")
+Init.mapSwitcher:addKey("default",    "<F12>", "<Cmd>lua vim.lsp.buf.definition()<CR>")
+Init.mapSwitcher:addKey("appearance", "<F9>",  "<Cmd>lua Init.gruvboxColor:changeBackground()<CR>")
+Init.mapSwitcher:addKey("appearance", "<F10>", "<Cmd>lua Init.gruvboxColor:changeContrast()<CR>")
+Init.mapSwitcher:addKey("appearance", "<F11>", "<Cmd>lua Init.gruvboxColor:cycleColor()<CR>")
+Init.mapSwitcher:addKey("appearance", "<F12>", "<Cmd>lua Init.toggler:toggleGuide()<CR>")
 Init.mapSwitcher:apply()
 
 vim.keymap.set("n", "<Bslash><CR>",     "<Cmd>lua Init.mapSwitcher:switchPreset()<CR>")
