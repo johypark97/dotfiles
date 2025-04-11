@@ -35,7 +35,6 @@ if vim.fn.has("clipboard") then
 end
 
 vim.cmd("set mouse=")
-vim.cmd("set pastetoggle=<C-Bslash>")
 
 vim.keymap.set("t", "<Esc>", "<C-Bslash><C-n>")
 
