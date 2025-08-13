@@ -8,7 +8,7 @@
 -- echo $MYVIMRC
 --     == vim.fn.stdpath("config") .. "/init.*"
 
-if vim.fn.has("nvim-0.10") == 0 then
+if vim.fn.has("nvim-0.11") == 0 then
     error("[init.lua] This version of Neovim is not supported.")
 end
 

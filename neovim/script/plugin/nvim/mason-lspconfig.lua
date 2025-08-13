@@ -11,8 +11,8 @@ local function createConfig()
 end
 
 return {
-    "williamboman/mason-lspconfig.nvim",
-    dependencies = { "neovim/nvim-lspconfig", "williamboman/mason.nvim" },
+    "mason-org/mason-lspconfig.nvim",
+    dependencies = { "neovim/nvim-lspconfig", "mason-org/mason.nvim" },
     opts = {
         ensure_installed = {
             "bashls",
@@ -27,18 +27,30 @@ return {
         -- setup lsp servers
         do
             local lspconfig = require("lspconfig")
+            local mason_registry = require("mason-registry")
 
-            -- mason servers
-            mason_lspconfig.setup_handlers({
-                function(server)
-                    lspconfig[server].setup(createConfig())
-                end,
-            })
-
-            -- local servers
             local serverList = {
                 "clangd",
             }
+
+            -- find all installed lsp servers
+            for _, installedPackage in ipairs(mason_registry.get_installed_packages()) do
+                repeat
+                    local spec = installedPackage.spec
+                    if spec == nil then
+                        break
+                    end
+
+                    local categoryList = spec.categories
+                    if categoryList[1] ~= "LSP" then
+                        break
+                    end
+
+                    local server = spec.neovim.lspconfig
+                    table.insert(serverList, server)
+                until true
+            end
+
             for _, server in ipairs(serverList) do
                 lspconfig[server].setup(createConfig())
             end

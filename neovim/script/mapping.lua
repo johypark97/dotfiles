@@ -28,6 +28,8 @@
 --   <Cmd>
 --   <SID>
 
+vim.g.mapleader = " "
+
 if vim.fn.has("clipboard") then
     vim.keymap.set("x", "<C-X>", "\"+x")
     vim.keymap.set("x", "<C-C>", "\"+y")
