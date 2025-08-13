@@ -24,6 +24,6 @@ alias free="free -ht"
 
 # https://stackoverflow.com/a/9074343
 alias glg1="git log --all --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'"
-alias glg2="git log --all --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)%n          %C(white)%s%C(reset)'"
-alias glg3="git log --all --graph --format=format:'%C(bold blue)%H%C(reset)%C(auto)%d%C(reset)%n%C(dim white)Author:%C(reset) %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(dim white)- %an <%ae>%C(reset)%n%C(dim white)Commit:%C(reset) %C(cyan)%cD%C(reset) %C(green)(%cr)%C(reset) %C(dim white)- %cn <%ce>%C(reset)%n%n%w(84,2,4)%C(white)%B%C(reset)%n'"
+alias glg2="git log --all --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%ai%C(reset) %C(bold green)(%ar)%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)%n          %C(white)%s%C(reset)'"
+alias glg3="git log --all --graph --format=format:'%C(bold blue)%H%C(reset)%C(auto)%d%C(reset)%n%C(dim white)Author:%C(reset) %C(bold cyan)%ai%C(reset) %C(bold green)(%ar)%C(reset) %C(dim white)- %an <%ae>%C(reset)%n%C(dim white)Commit:%C(reset) %C(cyan)%ci%C(reset) %C(green)(%cr)%C(reset) %C(dim white)- %cn <%ce>%C(reset)%n%n%w(84,2,4)%C(white)%B%C(reset)%n'"
 alias glg="glg1"
