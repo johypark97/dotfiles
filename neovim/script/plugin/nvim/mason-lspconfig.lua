@@ -2,12 +2,38 @@
 -- -------- mason-lspconfig --------
 -- =================================
 
-local function createConfig()
+local function setupLspServer()
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    local mason_registry = require("mason-registry")
 
-    return {
-        capabilities = cmp_nvim_lsp.default_capabilities(),
+    local lspServerSet = {
+        -- locally installed lsp servers
+        ["clangd"] = true,
     }
+
+    -- find all lsp servers installed by mason
+    for _, installedPackage in ipairs(mason_registry.get_installed_packages()) do
+        repeat
+            local spec = installedPackage.spec
+            if spec == nil then
+                break
+            end
+
+            local categoryList = spec.categories
+            if categoryList[1] ~= "LSP" then
+                break
+            end
+
+            local lspconfig = spec.neovim.lspconfig
+            lspServerSet[lspconfig] = true
+        until true
+    end
+
+    for lspServer in pairs(lspServerSet) do
+        vim.lsp.config(lspServer, {
+            capabilities = cmp_nvim_lsp.default_capabilities(),
+        })
+    end
 end
 
 return {
@@ -22,38 +48,10 @@ return {
     config = function(_, opts)
         local mason_lspconfig = require("mason-lspconfig")
 
+        -- setup mason-lspconfig
         mason_lspconfig.setup(opts)
 
         -- setup lsp servers
-        do
-            local lspconfig = require("lspconfig")
-            local mason_registry = require("mason-registry")
-
-            local serverList = {
-                "clangd",
-            }
-
-            -- find all installed lsp servers
-            for _, installedPackage in ipairs(mason_registry.get_installed_packages()) do
-                repeat
-                    local spec = installedPackage.spec
-                    if spec == nil then
-                        break
-                    end
-
-                    local categoryList = spec.categories
-                    if categoryList[1] ~= "LSP" then
-                        break
-                    end
-
-                    local server = spec.neovim.lspconfig
-                    table.insert(serverList, server)
-                until true
-            end
-
-            for _, server in ipairs(serverList) do
-                lspconfig[server].setup(createConfig())
-            end
-        end
+        setupLspServer()
     end,
 }
