@@ -32,6 +32,11 @@ local function setup(localLspServerList, manualInstallPackageList)
         })
     end
 
+    -- start the local lsp servers
+    for _, x in pairs(localLspServerList) do
+        vim.lsp.enable(x)
+    end
+
     -- print a manual installation message if some packages are not installed
     if not manualInstallPackageSet:isEmpty() then
         print(MESSAGE)
