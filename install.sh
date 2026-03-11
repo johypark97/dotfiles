@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 scriptRoot=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
 
