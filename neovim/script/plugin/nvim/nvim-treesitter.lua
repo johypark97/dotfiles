@@ -4,9 +4,10 @@
 
 return {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
     build = ":TSUpdate",
-    main = "nvim-treesitter.configs",
-    opts = {
-        ensure_installed = { "lua", "vimdoc" },
-    },
+    config = function()
+        local nvim_treesitter = require("nvim-treesitter")
+        nvim_treesitter.install({ "lua", "vimdoc" })
+    end,
 }
