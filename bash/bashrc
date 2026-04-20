@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
 
-# if not running interactively, don't do anything
-[[ -z $PS1 ]] && return
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
 
-# ===============================
-# -------- source script --------
-# ===============================
+# ======================
+# -------- main --------
+# ======================
 
-function sourceScript()
+function main()
 {
-    if [[ -f $1/$2 ]]; then
-        source "$1/$2"
-    else
-        echo "sourceScript() failed: cannot find $2"
-    fi
+    local -r SCRIPT_ROOT=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
+
+    export DOTFILES_ROOT=$( dirname "$SCRIPT_ROOT" )
+
+    source "$SCRIPT_ROOT/script/completion"
+    source "$SCRIPT_ROOT/script/function"
+    source "$SCRIPT_ROOT/script/prompt"
+    source "$SCRIPT_ROOT/script/config"
+    source "$SCRIPT_ROOT/script/alias"
 }
 
-scriptRoot=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
-export DOTFILES_ROOT=$( dirname "$scriptRoot" )
-sourceScript "$scriptRoot" script/completion
-sourceScript "$scriptRoot" script/function
-sourceScript "$scriptRoot" script/prompt
-sourceScript "$scriptRoot" script/config
-sourceScript "$scriptRoot" script/alias
-unset scriptRoot
+main
+unset main
