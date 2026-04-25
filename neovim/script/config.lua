@@ -31,7 +31,7 @@ vim.o.smarttab = true
 -- -------- advanced --------
 vim.o.backup = false
 vim.o.cmdheight = 2
-vim.o.colorcolumn = "50,72,80"
+vim.o.colorcolumn = "80"
 vim.o.conceallevel = 0
 vim.o.cursorline = true
 vim.o.hidden = false
@@ -61,6 +61,11 @@ vim.o.wrap = false
 vim.o.writebackup = true
 
 -- -------- filetype --------
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "gitcommit",
+    callback = function() vim.wo.colorcolumn = "50,72" end,
+})
+
 vim.api.nvim_create_autocmd("FileType", {
     pattern = { "c", "h" },
     callback = function() vim.bo.cindent = true end,
