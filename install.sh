@@ -37,15 +37,43 @@ function getopts_printError()
     fi
 }
 
+function confirmYesNo()
+{
+    local value
+    while :; do
+        read -ep "$1 (y/N): " value
+        value=${value:-N}
+        case $value in
+            Y | y) true; return ;;
+            N | n) false; return ;;
+            *) echo "invalid input: $value" ;;
+        esac
+    done
+}
+
 function installBashConfig()
 {
-    local -r FILE=$HOME/.bashrc
-    if [[ -L $FILE ]]; then
-        rm $FILE
-        echo "old .bashrc removed"
+    local -r INSTALL_PATH=$HOME/.bashrc
+    local -r LINK_DEST=$1/bash/bashrc
+
+    if [[ -L $INSTALL_PATH ]]; then
+        local linkPath=$( readlink $INSTALL_PATH )
+        if [[ $LINK_DEST == $linkPath ]]; then
+            echo ".bashrc is already installed."
+            return
+        fi
     fi
-    ln -s $1/bash/bashrc $FILE
-    echo ".bashrc installed: $FILE"
+
+    if [[ -e $INSTALL_PATH || -L $INSTALL_PATH ]]; then
+        echo "another .bashrc already exists."
+        confirmYesNo "Do you want to overwrite it?" || return
+        echo -n "removing .bashrc..."
+        rm $INSTALL_PATH
+        echo " done"
+    fi
+
+    ln -s $LINK_DEST $INSTALL_PATH
+    echo ".bashrc installed: $INSTALL_PATH"
 }
 
 function installNeovimConfig()
