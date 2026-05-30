@@ -3,7 +3,7 @@
 This is my custom code style scheme used in IntelliJ IDEA.
 
 - Base scheme: [Google Java Style](https://github.com/google/styleguide) (intellij-java-google-style.xml)
-- Exported from: IntelliJ IDEA 2026.1.1
+- Exported from: IntelliJ IDEA 2026.1.2
 
 ## Customizations
 
@@ -28,13 +28,18 @@ This is my custom code style scheme used in IntelliJ IDEA.
     - [ ] Line breaks
   - Extends/implements/permits keyword: Wrap if long
   - Method declaration parameters: Chop down if long
-    - [x] Align when multiline
+    - [x] New line after '('
+    - [x] Place ')' on new line
   - Method call arguments: Chop down if long
+    - [x] New line after '('
   - Chained method calls: Chop down if long
   - 'try-with-resources': Wrap always
   - Assignment statement: Wrap if long
+  - Ternary operation: Chop down if long
   - Enum constants: Wrap always
   - Record components: Chop down if long
+    - [x] New line after '('
+    - [x] Place ')' on new line
 
 - Blank Lines
   - Minimum blank lines
@@ -86,6 +91,18 @@ This is my custom code style scheme used in IntelliJ IDEA.
     - [ ] Block comment at first column
     - [x] Add spaces around block comments
 
+### Editor > Code Style > HTML
+
+- Other
+  - Wrap attributes: Do not wrap
+  - [ ] Wrap text
+
+- Code Generation
+  - Comments
+    - [ ] Line comment at first column
+    - [ ] Block comment at first column
+    - [x] Add spaces around block comments
+
 ### Editor > Code Style > XML
 
 - Other
@@ -101,3 +118,8 @@ This is my custom code style scheme used in IntelliJ IDEA.
     - [ ] Line comment at first column
     - [ ] Block comment at first column
     - [x] Add spaces around block comments
+
+### Editor > Code Style > Other File Types
+
+- Tab size: 4
+- Indent: 4
