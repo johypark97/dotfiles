@@ -13,37 +13,37 @@ This is my custom code style scheme used in IntelliJ IDEA.
 
 ### Editor > Code Style
 
-- Line separator: Unix and macOS (\n)
+- Line separator: `System-Dependent` -> `Unix and macOS (\n)`
 - [ ] Detect and use existing file indents for editing
 
 ### Editor > Code Style > Java
 
 - Tabs and Indents
-  - Tab size: 4
-  - Indent: 4
-  - Continuation indent: 8
+  - Tab size: `2` -> `4`
+  - Indent: `2` -> `4`
+  - Continuation indent: `4` -> `8`
 
 - Wrapping and Braces
   - Keep when reformatting
     - [ ] Line breaks
-  - Extends/implements/permits keyword: Wrap if long
-  - Method declaration parameters: Chop down if long
+  - Extends/implements/permits keyword: `Do not wrap` -> `Wrap if long`
+  - Method declaration parameters: `Wrap if long` -> `Chop down if long`
     - [x] New line after '('
     - [x] Place ')' on new line
-  - Method call arguments: Chop down if long
+  - Method call arguments: `Wrap if long` -> `Chop down if long`
     - [x] New line after '('
-  - Chained method calls: Chop down if long
-  - 'try-with-resources': Wrap always
-  - Assignment statement: Wrap if long
-  - Ternary operation: Chop down if long
-  - Enum constants: Wrap always
-  - Record components: Chop down if long
+  - Chained method calls: `Wrap if long` -> `Chop down if long`
+  - 'try-with-resources': `Do not wrap` -> `Wrap always`
+  - Assignment statement: `Do not wrap` -> `Wrap if long`
+  - Ternary operation: `Wrap if long` -> `Chop down if long`
+  - Enum constants: `Do not wrap` -> `Wrap always`
+  - Record components: `Wrap if long` -> `Chop down if long`
     - [x] New line after '('
     - [x] Place ')' on new line
 
 - Blank Lines
   - Minimum blank lines
-    - After class header: 0
+    - After class header: `1` -> `0`
 
 - Imports
   - General
@@ -94,7 +94,7 @@ This is my custom code style scheme used in IntelliJ IDEA.
 ### Editor > Code Style > HTML
 
 - Other
-  - Wrap attributes: Do not wrap
+  - Wrap attributes: `Wrap if long` -> `Do not wrap`
   - [ ] Wrap text
 
 - Code Generation
@@ -106,7 +106,7 @@ This is my custom code style scheme used in IntelliJ IDEA.
 ### Editor > Code Style > XML
 
 - Other
-  - Wrap attributes: Do not wrap
+  - Wrap attributes: `Wrap if long` -> `Do not wrap`
   - [ ] Wrap text
   - [x] Align attributes
 
@@ -121,5 +121,5 @@ This is my custom code style scheme used in IntelliJ IDEA.
 
 ### Editor > Code Style > Other File Types
 
-- Tab size: 4
-- Indent: 4
+- Tab size: `2` -> `4`
+- Indent: `2` -> `4`
