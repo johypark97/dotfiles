@@ -37,6 +37,7 @@ This is my custom code style scheme used in IntelliJ IDEA.
   - Assignment statement: `Do not wrap` -> `Wrap if long`
   - Ternary operation: `Wrap if long` -> `Chop down if long`
   - Enum constants: `Do not wrap` -> `Wrap always`
+  - Annotation parameters: `Do not wrap` -> `Wrap if long`
   - Record components: `Wrap if long` -> `Chop down if long`
     - [x] New line after '('
     - [x] Place ')' on new line
@@ -91,6 +92,34 @@ This is my custom code style scheme used in IntelliJ IDEA.
     - [ ] Block comment at first column
     - [x] Add spaces around block comments
 
+### Editor > Code Style > Kotlin
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+- Code Generation
+  - Comment Code
+    - [ ] Line comment at first column
+    - [x] Add a space at line comment start
+      - [x] Enforce on reformat
+    - [ ] Block comment at first column
+    - [x] Add spaces around block comments
+
+### Editor > Code Style > Groovy
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+- Code Generation
+  - Comment Code
+    - [ ] Line comment at first column
+    - [x] Add a space at line comment start
+      - [x] Enforce on reformat
+    - [ ] Block comment at first column
+    - [x] Add spaces around block comments
+
 ### Editor > Code Style > HTML
 
 - Other
@@ -100,6 +129,34 @@ This is my custom code style scheme used in IntelliJ IDEA.
 - Code Generation
   - Comments
     - [ ] Line comment at first column
+    - [ ] Block comment at first column
+    - [x] Add spaces around block comments
+
+### Editor > Code Style > JavaScript
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+- Code Generation
+  - Comments
+    - [ ] Block comment at first column
+    - [x] Add spaces around block comments
+
+### Editor > Code Style > JSON
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+### Editor > Code Style > TypeScript
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+- Code Generation
+  - Comments
     - [ ] Block comment at first column
     - [x] Add spaces around block comments
 
@@ -118,6 +175,18 @@ This is my custom code style scheme used in IntelliJ IDEA.
     - [ ] Line comment at first column
     - [ ] Block comment at first column
     - [x] Add spaces around block comments
+
+### Editor > Code Style > YAML
+
+- Wrapping and Braces
+  - Keep when reformatting
+    - [ ] Line breaks
+
+- Code Generation
+  - Comments
+    - [ ] Line comment at first column
+    - [x] Add a space at line comment start
+      - [x] Enforce on reformat
 
 ### Editor > Code Style > Other File Types
 
