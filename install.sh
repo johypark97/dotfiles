@@ -51,29 +51,69 @@ function confirmYesNo()
     done
 }
 
-function installBashConfig()
+function installBashConfig_linux()
 {
     local -r INSTALL_PATH=$HOME/.bashrc
-    local -r LINK_DEST=$1/bash/bashrc
+    local -r LINK_TARGET=$1/bash/bashrc
+
+    echo "Linux environment detected. Installing .bashrc as a symlink."
 
     if [[ -L $INSTALL_PATH ]]; then
         local linkPath=$( readlink $INSTALL_PATH )
-        if [[ $LINK_DEST == $linkPath ]]; then
+        if [[ $linkPath == $LINK_TARGET ]]; then
             echo ".bashrc is already installed."
             return
         fi
     fi
 
     if [[ -e $INSTALL_PATH || -L $INSTALL_PATH ]]; then
-        echo "another .bashrc already exists."
+        echo ".bashrc already exists."
         confirmYesNo "Do you want to overwrite it?" || return
         echo -n "removing .bashrc..."
         rm $INSTALL_PATH
         echo " done"
     fi
 
-    ln -s $LINK_DEST $INSTALL_PATH
+    ln -s $LINK_TARGET $INSTALL_PATH
     echo ".bashrc installed: $INSTALL_PATH"
+}
+
+function installBashConfig_mingw()
+{
+    local -r INSTALL_PATH=$HOME/.bashrc
+    local -r SOURCE_TARGET=$1/bash/bashrc
+    local -r BASHRC_CONTENT="source $SOURCE_TARGET"
+
+    echo "MINGW environment detected. Installing .bashrc as a source file."
+
+    if [[ -e $INSTALL_PATH ]]; then
+        local content=$( cat $INSTALL_PATH )
+        if [[ $content == $BASHRC_CONTENT ]]; then
+            echo ".bashrc is already installed."
+            return
+        fi
+    fi
+
+    if [[ -e $INSTALL_PATH || -L $INSTALL_PATH ]]; then
+        echo ".bashrc already exists."
+        confirmYesNo "Do you want to overwrite it?" || return
+        echo -n "removing .bashrc..."
+        rm $INSTALL_PATH
+        echo " done"
+    fi
+
+    echo $BASHRC_CONTENT > $INSTALL_PATH
+    echo ".bashrc installed: $INSTALL_PATH"
+}
+
+function installBashConfig()
+{
+    local -r SYSTEM_NAME=$( uname -s )
+    case $SYSTEM_NAME in
+        Linux) installBashConfig_linux "$@" ;;
+        MINGW*) installBashConfig_mingw "$@" ;;
+        *) echo "Unsupported system: $SYSTEM_NAME" ;;
+    esac
 }
 
 function installNeovimConfig()
