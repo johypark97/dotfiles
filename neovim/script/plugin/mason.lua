@@ -3,7 +3,6 @@
 -- =======================
 
 return {
-    "williamboman/mason.nvim",
-    build = ":MasonUpdate",
+    "mason-org/mason.nvim",
     config = true,
 }

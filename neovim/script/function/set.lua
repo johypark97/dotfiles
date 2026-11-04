@@ -78,6 +78,18 @@ function Set:remove(value)
     self._table[value] = nil
 end
 
+function Set:removeAll(value)
+    if value == nil then
+        error("value is nil")
+    elseif type(value) ~= "table" then
+        error("value is not a list")
+    end
+
+    for _, x in pairs(value) do
+        self:remove(x)
+    end
+end
+
 function Set:toList()
     local list = {}
 

@@ -24,11 +24,11 @@ function Toggler:new()
 end
 
 function Toggler:toggleGuide()
-    local x = vim.wo.list == self._INITIAL_VALUE.list
-            and vim.wo.number == self._INITIAL_VALUE.number
-            and vim.wo.signcolumn == self._INITIAL_VALUE.signcolumn
+    local enabled = vim.wo.list == self._INITIAL_VALUE.list
+        and vim.wo.number == self._INITIAL_VALUE.number
+        and vim.wo.signcolumn == self._INITIAL_VALUE.signcolumn
 
-    if x then
+    if enabled then
         vim.wo.list = false
         vim.wo.number = false
         vim.wo.signcolumn = "no"
@@ -38,8 +38,9 @@ function Toggler:toggleGuide()
         vim.wo.signcolumn = self._INITIAL_VALUE.signcolumn
     end
 
+    local bufferNumber = vim.api.nvim_get_current_buf()
     for _, callback in pairs(self._callbackList) do
-        callback(not x)
+        callback(bufferNumber, not enabled)
     end
 end
 

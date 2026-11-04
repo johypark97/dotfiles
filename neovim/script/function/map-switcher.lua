@@ -69,8 +69,8 @@ function MapSwitcher:apply()
 
     for key, _ in pairs(keySet) do
         local rhs = string.format("<Cmd>lua %s:%s('%s')<CR>",
-                self._GLOBAL_INSTANCE_NAME, self._KEY_METHOD_NAME,
-                key:gsub("<", "<lt>"))
+            self._GLOBAL_INSTANCE_NAME, self._KEY_METHOD_NAME,
+            key:gsub("<", "<lt>"))
 
         local mapped = vim.fn.maparg(key, "n", false, true)
         if not next(mapped) then
@@ -120,7 +120,7 @@ function MapSwitcher:switchPreset()
     end
 
     print(string.format("MapSwitcher(%d/%d): %s", self._presetIndex, length,
-            self._presetList[self._presetIndex].name))
+        self._presetList[self._presetIndex].name))
 end
 
 function MapSwitcher:pressKey(key)
@@ -148,9 +148,7 @@ end
 -- -------- private --------
 
 function MapSwitcher:_error(format, ...)
-    local args = { ... }
-
-    error(string.format("MapSwitcher: " .. format, unpack(args)), 0)
+    error(string.format("MapSwitcher: " .. format, ...), 0)
 end
 
 function MapSwitcher:_isReady()

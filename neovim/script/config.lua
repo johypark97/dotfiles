@@ -2,71 +2,58 @@
 -- -------- config --------
 -- ========================
 
--- -------- color --------
-vim.o.background = "dark"
-vim.o.termguicolors = false
+-- -------- appearance --------
 
--- -------- common --------
-vim.cmd("filetype plugin indent on")
-vim.cmd("syntax on")
+-- header
+vim.o.showtabline = 2
 
-vim.o.backspace = "indent,eol,start"
-vim.o.encoding = "utf-8"
-vim.o.fileformats = "unix,dos"
-vim.o.history = 1024
-vim.o.title = true
+-- signcolumn
+vim.o.number = true
+vim.o.numberwidth = 5
+vim.o.signcolumn = "yes:2"
 
--- -------- tab --------
+-- editor
+vim.o.colorcolumn = "80"
+vim.o.cursorline = true
+
+vim.o.list = true
+vim.o.listchars = "tab:  →,nbsp:␣,trail:•,conceal:◦,precedes:⟨,extends:⟩" -- ,eol:↲
+vim.o.showbreak = "↪ "
+
+vim.o.scrolloff = 1
+vim.o.sidescrolloff = 5
+
+vim.o.wrap = false
+
+-- footer
+vim.o.cmdheight = 2
+
+-- -------- indent --------
 vim.o.expandtab = true
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
 vim.o.softtabstop = 4
 vim.o.tabstop = 4
 
--- -------- indent --------
-vim.o.autoindent = true
-vim.o.smartindent = true
-vim.o.smarttab = true
+-- -------- control --------
 
--- -------- advanced --------
-vim.o.backup = false
-vim.o.cmdheight = 2
-vim.o.colorcolumn = "80"
-vim.o.conceallevel = 0
-vim.o.cursorline = true
-vim.o.hidden = false
+-- search
 vim.o.ignorecase = true
-vim.o.incsearch = true
-vim.o.laststatus = 2
-vim.o.list = true
-vim.o.listchars = "tab:  →,nbsp:␣,trail:•,conceal:◦,precedes:⟨,extends:⟩" -- ,eol:↲
-vim.o.number = true
-vim.o.numberwidth = 5
-vim.o.relativenumber = false
-vim.o.ruler = true
-vim.o.scrolloff = 1
-vim.o.showbreak = "↪ "
-vim.o.showcmd = true
-vim.o.showmode = true
-vim.o.showtabline = 2
-vim.o.sidescrolloff = 5
-vim.o.signcolumn = "yes:2"
 vim.o.smartcase = true
+
+-- window
 vim.o.splitbelow = true
 vim.o.splitright = true
-vim.o.timeout = false
-vim.o.updatetime = 500
-vim.o.wildmenu = true
-vim.o.wrap = false
-vim.o.writebackup = true
 
--- -------- filetype --------
+-- control
+vim.o.mouse = ""
+vim.o.timeout = false
+
+-- -------- file --------
+vim.g.c_syntax_for_h = true
+vim.o.fileformats = "unix,dos"
+
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "gitcommit",
     callback = function() vim.wo.colorcolumn = "50,72" end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "c", "h" },
-    callback = function() vim.bo.cindent = true end,
 })

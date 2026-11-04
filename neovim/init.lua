@@ -8,7 +8,7 @@
 -- echo $MYVIMRC
 --     == vim.fn.stdpath("config") .. "/init.*"
 
-if vim.fn.has("nvim-0.11") == 0 then
+if vim.fn.has("nvim-0.12") == 0 then
     error("[init.lua] This version of Neovim is not supported.")
 end
 
@@ -60,7 +60,7 @@ Init.scriptLoader = Init.scriptLoader or ScriptLoader:new()
 -- stage 0
 Init.scriptLoader:addLuaPath()
 Init.scriptLoader:addVimPath()
-Init.scriptLoader:dofile("bootstrap_lazy.lua")
+Init.scriptLoader:dofile("bootstrap-lazy.lua")
 
 -- stage 1
 Init.scriptLoader:dofile("script/config.lua")
@@ -73,3 +73,10 @@ Init.scriptLoader:dofile("script/autocmd.lua")
 Init.scriptLoader:dofile("script/command.lua")
 Init.scriptLoader:dofile("script/mapping.lua")
 Init.scriptLoader:dofile("script/plugin.lua")
+
+-- stage 4
+Init.scriptLoader:dofile("script/mason-package.lua")
+Init.scriptLoader:dofile("script/local-lsp.lua")
+
+-- stage 5
+-- Init.postInitializer:initialize()

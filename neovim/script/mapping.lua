@@ -8,11 +8,11 @@
 -- :help script-local
 
 -- combinations
---   Ctrl (C) / Alt (M) / Shift (S)
---   <C- ... > <M- ... > <S- ... >
+--   Ctrl (C) / Alt (A) / Shift (S)
+--   <C- ... > <A- ... > <S- ... >
 --     - Ctrl + character = <C- (lowercase) >
 --     - Ctrl + Shift + character = <C- (uppercase) >
---     - Alt (M) is case-sensitive
+--     - Alt is case-sensitive
 
 -- special keys
 --   <Leader>
@@ -30,27 +30,19 @@
 
 vim.g.mapleader = " "
 
-if vim.fn.has("clipboard") then
-    vim.keymap.set("x", "<C-X>", "\"+x")
-    vim.keymap.set("x", "<C-C>", "\"+y")
-    vim.keymap.set("i", "<C-V>", "<C-r>+")
-end
-
-vim.cmd("set mouse=")
-
 vim.keymap.set("t", "<Esc>", "<C-Bslash><C-n>")
 
-vim.keymap.set({ "n", "i", "x", "s" }, "<M-q>", "<Esc>")
+vim.keymap.set({ "n", "i", "x", "s" }, "<A-q>", "<Esc>")
 
-vim.keymap.set("i", "<M-h>", "<Left>")
-vim.keymap.set("i", "<M-j>", "<Down>")
-vim.keymap.set("i", "<M-k>", "<Up>")
-vim.keymap.set("i", "<M-l>", "<Right>")
+vim.keymap.set("i", "<A-h>", "<Left>")
+vim.keymap.set("i", "<A-j>", "<Down>")
+vim.keymap.set("i", "<A-k>", "<Up>")
+vim.keymap.set("i", "<A-l>", "<Right>")
 
-vim.keymap.set("n", "<M-H>",     "<S-Left>",  { remap = true })
-vim.keymap.set("n", "<M-J>",     "<S-Down>",  { remap = true })
-vim.keymap.set("n", "<M-K>",     "<S-Up>",    { remap = true })
-vim.keymap.set("n", "<M-L>",     "<S-Right>", { remap = true })
+vim.keymap.set("n", "<A-H>",     "<S-Left>",  { remap = true })
+vim.keymap.set("n", "<A-J>",     "<S-Down>",  { remap = true })
+vim.keymap.set("n", "<A-K>",     "<S-Up>",    { remap = true })
+vim.keymap.set("n", "<A-L>",     "<S-Right>", { remap = true })
 vim.keymap.set("n", "<S-Up>",    "<C-w>-")
 vim.keymap.set("n", "<S-Down>",  "<C-w>+")
 vim.keymap.set("n", "<S-Left>",  "<C-w><")
@@ -69,14 +61,14 @@ vim.keymap.set("n", "<Leader><Tab>q", "<Cmd>tabclose<CR>")
 vim.keymap.set("n", "<Leader><Tab>l", "gt")
 vim.keymap.set("n", "<Leader><Tab>h", "gT")
 
-vim.keymap.set("c", "<M-h>", "<Left>",  { remap = true })
-vim.keymap.set("c", "<M-j>", "<Down>",  { remap = true })
-vim.keymap.set("c", "<M-k>", "<Up>",    { remap = true })
-vim.keymap.set("c", "<M-l>", "<Right>", { remap = true })
-vim.keymap.set("c", "<M-b>", "<S-Left>")
-vim.keymap.set("c", "<M-f>", "<S-Right>")
+vim.keymap.set("c", "<A-h>", "<Left>",  { remap = true })
+vim.keymap.set("c", "<A-j>", "<Down>",  { remap = true })
+vim.keymap.set("c", "<A-k>", "<Up>",    { remap = true })
+vim.keymap.set("c", "<A-l>", "<Right>", { remap = true })
+vim.keymap.set("c", "<A-b>", "<S-Left>")
+vim.keymap.set("c", "<A-f>", "<S-Right>")
 
--- vim.cmd("set wildcharm=<C-z>")
+vim.cmd("set wildcharm=<C-z>")
 vim.keymap.set("c", "<Up>",    function() return vim.fn.wildmenumode() == 1 and "<Left>"     or "<Up>"    end, { expr = true })
 vim.keymap.set("c", "<Down>",  function() return vim.fn.wildmenumode() == 1 and "<Right>"    or "<Down>"  end, { expr = true })
 vim.keymap.set("c", "<Left>",  function() return vim.fn.wildmenumode() == 1 and "<Up>"       or "<Left>"  end, { expr = true })
@@ -85,52 +77,16 @@ vim.keymap.set("c", "<Right>", function() return vim.fn.wildmenumode() == 1 and 
 vim.keymap.set("n", "<Bslash><BS><BS>", "<Cmd>edit $MYVIMRC<CR>")
 vim.keymap.set("n", "<Bslash><BS><CR>", "<Cmd>source $MYVIMRC<CR>")
 
--- ================================
--- -------- mappping - LSP --------
--- ================================
-
---[[
-vim.lsp.buf.add_workspace_folder()
-vim.lsp.buf.clear_references()
-vim.lsp.buf.code_action()
-vim.lsp.buf.completion()
-vim.lsp.buf.declaration()
-vim.lsp.buf.definition()
-vim.lsp.buf.document_highlight()
-vim.lsp.buf.document_symbol()
-vim.lsp.buf.execute_command()
-vim.lsp.buf.format()
-vim.lsp.buf.hover()
-vim.lsp.buf.implementation()
-vim.lsp.buf.incoming_calls()
-vim.lsp.buf.list_workspace_folders()
-vim.lsp.buf.outgoing_calls()
-vim.lsp.buf.references()
-vim.lsp.buf.remove_workspace_folder()
-vim.lsp.buf.rename()
-vim.lsp.buf.signature_help()
-vim.lsp.buf.type_definition()
-vim.lsp.buf.typehierarchy()
-vim.lsp.buf.typehierarchy()
-vim.lsp.buf.workspace_symbol()
-]]
-
-vim.keymap.set("n", "<M-f>", "<Cmd>lua vim.lsp.buf.format({ timeout_ms = 4000 })<CR>")
-
 -- ========================================
 -- -------- mappping - MapSwitcher --------
 -- ========================================
 
-Init.mapSwitcher:setExecutor("<M-Bslash>")
+Init.mapSwitcher:setExecutor("<A-Bslash>")
 Init.mapSwitcher:addKey("default",    "<F2>",  "<Cmd>lua vim.lsp.buf.rename()<CR>")
-Init.mapSwitcher:addKey("default",    "<F8>",  "<Cmd>NvimTreeToggle<CR>")
 Init.mapSwitcher:addKey("default",    "<F9>",  "<Cmd>lua vim.lsp.buf.hover()<CR>")
 Init.mapSwitcher:addKey("default",    "<F10>", "<Cmd>lua vim.lsp.buf.references()<CR>")
 Init.mapSwitcher:addKey("default",    "<F11>", "<Cmd>lua vim.lsp.buf.implementation()<CR>")
 Init.mapSwitcher:addKey("default",    "<F12>", "<Cmd>lua vim.lsp.buf.definition()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F9>",  "<Cmd>lua Init.gruvboxColor:changeBackground()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F10>", "<Cmd>lua Init.gruvboxColor:changeContrast()<CR>")
-Init.mapSwitcher:addKey("appearance", "<F11>", "<Cmd>lua Init.gruvboxColor:cycleColor()<CR>")
 Init.mapSwitcher:addKey("appearance", "<F12>", "<Cmd>lua Init.toggler:toggleGuide()<CR>")
 Init.mapSwitcher:apply()
 
@@ -141,6 +97,6 @@ vim.keymap.set("n", "<Bslash><Bslash>", "<Cmd>lua Init.mapSwitcher:help()<CR>")
 -- -------- mappping - Toggler --------
 -- ====================================
 
-Init.toggler:addCallback(function(value)
-    require("ibl").setup_buffer(0, { enabled = value })
+Init.toggler:addCallback(function(bufferNumber, enabled)
+    vim.b[bufferNumber].snacks_indent = enabled
 end)
