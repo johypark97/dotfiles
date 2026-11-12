@@ -135,10 +135,8 @@ function checkNeovimPackage()
     local -Ar MAP=(
         [curl]=curl
         [gzip]=gzip
-        [luarocks]=luarocks
         [node]=nodejs
         [npm]=npm
-        [pip]=python3-pip
         [python3]=python3
         [tar]=tar
         [tree-sitter]="tree-sitter-cli (npm)"

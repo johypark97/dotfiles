@@ -7,6 +7,7 @@ local mason_registry = require("mason-registry")
 local list = {
     "black",
     "prettier",
+    "shellcheck",
 }
 
 local set = Init.Set:new()
