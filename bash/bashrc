@@ -6,22 +6,19 @@ case $- in
     *) return ;;
 esac
 
-# ======================
-# -------- main --------
-# ======================
-
-function main()
+main()
 {
     local -r SCRIPT_ROOT=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
 
-    export DOTFILES_ROOT=$( dirname "$SCRIPT_ROOT" )
+    local dotfiles_root
+    dotfiles_root=$( dirname "$SCRIPT_ROOT" )
+    export DOTFILES_ROOT=$dotfiles_root
 
-    source "$SCRIPT_ROOT/script/completion"
-    source "$SCRIPT_ROOT/script/function"
-    source "$SCRIPT_ROOT/script/prompt"
-    source "$SCRIPT_ROOT/script/config"
-    source "$SCRIPT_ROOT/script/alias"
+    source "$SCRIPT_ROOT/script/function.sh"
+    source "$SCRIPT_ROOT/script/prompt.sh"
+    source "$SCRIPT_ROOT/script/config.sh"
+    source "$SCRIPT_ROOT/script/alias.sh"
 }
 
 main
-unset main
+unset -f main

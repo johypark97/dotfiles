@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# =======================
-# -------- alias --------
-# =======================
-
 alias ..="cd .."
 alias l="ls -h"
 alias la="ls -ahl"

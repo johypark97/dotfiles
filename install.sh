@@ -1,136 +1,128 @@
 #!/usr/bin/env bash
 
-# ========================
-# -------- string --------
-# ========================
+: # enable line-specific shellcheck suppression
 
-readonly STRING_HELP_INFO="Try '$( basename "$0" ) -h' for more information."
+# shellcheck disable=SC2155
+readonly SCRIPT_ROOT=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
 
-readonly STRING_HELP=$( cat << EOF
+# shellcheck disable=SC2155
+readonly HELP_HINT="Try '$( basename "$0" ) -h' for more information."
+
+# shellcheck disable=SC2155
+readonly HELP_MAIN=$( cat << EOF
 Usage:
-    $( basename "$0" ) (option...) [task]
+    $( basename "$0" ) [OPTION]... COMMAND
 
-Tasks:
+Commands:
     all              install bashrc and neovim, and check neovim's requirements
     bashrc           install bashrc only
     neovim-config    install neovim config only
     neovim-check     check neovim's requirements
-    help             print help messages
+    help             display help information
 
 Options:
-    -h    print help messages
+    -h    display this help and exit
 EOF
 )
 
-# ==========================
-# -------- function --------
-# ==========================
-
-function getopts_printError()
+confirm_yes_no()
 {
-    if [[ -n $2 ]]; then
-        case $1 in
-            :) echo "option requires an argument: -$2" ;;
-            ?) echo "invalid option: -$2" ;;
-            *) echo "unknown error" ;;
-        esac
-    fi
-}
-
-function confirmYesNo()
-{
-    local value
+    local prompt=${1:?prompt is required}
     while :; do
-        read -ep "$1 (y/N): " value
-        value=${value:-N}
+        read -erp "$prompt (y/N): " value
+        local value=${value:-N}
         case $value in
-            Y | y) true; return ;;
-            N | n) false; return ;;
-            *) echo "invalid input: $value" ;;
+            Y | y) return 0 ;;
+            N | n) return 1 ;;
+            *) printf 'invalid input: %s\n' "$value" >&2 ;;
         esac
     done
 }
 
-function installBashConfig_linux()
+is_symbolic_link_of()
 {
-    local -r INSTALL_PATH=$HOME/.bashrc
-    local -r LINK_TARGET=$1/bash/bashrc
+    local -r LINK_PATH=${1:?link path is required}
+    local -r TARGET_PATH=${2:?target path is required}
 
-    echo "Linux environment detected. Installing .bashrc as a symlink."
+    [[ -L $LINK_PATH ]] || return 1
 
-    if [[ -L $INSTALL_PATH ]]; then
-        local linkPath=$( readlink $INSTALL_PATH )
-        if [[ $linkPath == $LINK_TARGET ]]; then
-            echo ".bashrc is already installed."
-            return
-        fi
-    fi
+    local path
+    path=$( readlink "$LINK_PATH" ) || {
+        printf 'failed to read link path: %s\n' "$LINK_PATH" >&2
+        return 1
+    }
 
-    if [[ -e $INSTALL_PATH || -L $INSTALL_PATH ]]; then
-        echo ".bashrc already exists."
-        confirmYesNo "Do you want to overwrite it?" || return
-        echo -n "removing .bashrc..."
-        rm $INSTALL_PATH
-        echo " done"
-    fi
-
-    ln -s $LINK_TARGET $INSTALL_PATH
-    echo ".bashrc installed: $INSTALL_PATH"
+    [[ $path == "$TARGET_PATH" ]]
 }
 
-function installBashConfig_mingw()
+create_or_replace_symbolic_link()
 {
-    local -r INSTALL_PATH=$HOME/.bashrc
-    local -r SOURCE_TARGET=$1/bash/bashrc
-    local -r BASHRC_CONTENT="source $SOURCE_TARGET"
+    local -r LINK_PATH=${1:?link path is required}
+    local -r TARGET_PATH=${2:?target path is required}
 
-    echo "MINGW environment detected. Installing .bashrc as a source file."
-
-    if [[ -e $INSTALL_PATH ]]; then
-        local content=$( cat $INSTALL_PATH )
-        if [[ $content == $BASHRC_CONTENT ]]; then
-            echo ".bashrc is already installed."
-            return
-        fi
+    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
+        printf 'removing old file... '
+        rm "$LINK_PATH" || return 1
+        printf 'done\n'
     fi
 
-    if [[ -e $INSTALL_PATH || -L $INSTALL_PATH ]]; then
-        echo ".bashrc already exists."
-        confirmYesNo "Do you want to overwrite it?" || return
-        echo -n "removing .bashrc..."
-        rm $INSTALL_PATH
-        echo " done"
+    printf 'creating new symbolic link... '
+
+    local dir_path
+    dir_path=$( dirname "$LINK_PATH" ) || return 1
+
+    mkdir -p "$dir_path" || return 1
+    ln -s "$TARGET_PATH" "$LINK_PATH" || return 1
+
+    printf 'done\n'
+
+}
+
+install_bash_config()
+{
+    local -r LINK_PATH=$HOME/.bashrc
+    local -r TARGET_PATH=$SCRIPT_ROOT/bash/bashrc
+
+    printf 'Installing .bashrc\n'
+
+    if is_symbolic_link_of "$LINK_PATH" "$TARGET_PATH"; then
+        printf '.bashrc is already installed.\n'
+        return 0
     fi
 
-    echo $BASHRC_CONTENT > $INSTALL_PATH
-    echo ".bashrc installed: $INSTALL_PATH"
-}
-
-function installBashConfig()
-{
-    local -r SYSTEM_NAME=$( uname -s )
-    case $SYSTEM_NAME in
-        Linux) installBashConfig_linux "$@" ;;
-        MINGW*) installBashConfig_mingw "$@" ;;
-        *) echo "Unsupported system: $SYSTEM_NAME" ;;
-    esac
-}
-
-function installNeovimConfig()
-{
-    local -r DIR=$HOME/.config/nvim
-    local -r FILE=$DIR/init.lua
-    if [[ ! -d $DIR ]]; then
-        mkdir -p $DIR
-    elif [[ -L $FILE ]]; then
-        rm $FILE
-        echo "old Neovim config removed"
+    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
+        printf '.bashrc is already exists: %s\n' "$LINK_PATH"
+        confirm_yes_no "Do you want to overwrite it?" || return 0
     fi
-    ln -s $1/neovim/init.lua $FILE
-    echo "Neovim config installed: $FILE"
+
+    create_or_replace_symbolic_link "$LINK_PATH" "$TARGET_PATH" || return 0
+
+    printf '.bashrc installed: %s\n' "$LINK_PATH"
 }
 
-function checkNeovimPackage()
+install_neovim_config()
+{
+    local -r LINK_PATH=$HOME/.config/nvim/init.lua
+    local -r TARGET_PATH=$SCRIPT_ROOT/neovim/init.lua
+
+    printf 'Installing Neovim config\n'
+
+    if is_symbolic_link_of "$LINK_PATH" "$TARGET_PATH"; then
+        printf 'Neovim config is already installed.\n'
+        return 0
+    fi
+
+    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
+        printf 'Neovim config is already exists: %s\n' "$LINK_PATH"
+        confirm_yes_no "Do you want to overwrite it?" || return 0
+    fi
+
+    create_or_replace_symbolic_link "$LINK_PATH" "$TARGET_PATH" || return 0
+
+    printf 'Neovim config installed: %s\n' "$LINK_PATH"
+}
+
+check_neovim_requirements()
 {
     local -Ar MAP=(
         [curl]=curl
@@ -144,84 +136,95 @@ function checkNeovimPackage()
         [wget]=wget
     )
 
-    echo "Checking Neovim requirements:"
-    for key in ${!MAP[@]}; do
+    local width=0
+
+    local key
+    for key in "${!MAP[@]}"; do
+        local x=${#key}
+        (( x > width )) && width=$x
+    done
+    (( width += 4 ))
+
+    printf 'Checking Neovim requirements:\n'
+    for key in "${!MAP[@]}"; do
         local value=${MAP[$key]}
 
-        echo -n "- $key command: "
-        if command -v $key > /dev/null; then
-            echo OK.
+        printf "%${width}s command: " "$key"
+        if command -v "$key" > /dev/null; then
+            printf 'OK.\n'
         else
-            echo "Not found. Please install the '$value' package."
+            printf 'Not found. Please install the %s package.\n' "'$value'"
         fi
     done
 
-    echo "For more information, please run the ':checkhealth' command in Neovim."
+    printf '%s\n' "For more information, please run the ':checkhealth' command in Neovim."
 }
 
-# ======================
-# -------- main --------
-# ======================
-
-function main()
+main()
 {
-    local filename
-    local flagVerbose=0
-
-    OPTIND=1
-    while getopts :f:vh opt; do
+    local OPTIND=1 OPTARG opt
+    while getopts :h opt; do
         case $opt in
-            f) filename=$OPTARG ;;
-            v) flagVerbose=1 ;;
             h)
-                echo "$STRING_HELP"
-                exit 0
+                printf '%s\n' "$HELP_MAIN"
+                return 0
+                ;;
+            :)
+                [[ -n $OPTARG ]] && \
+                    printf 'option requires an argument: -%s\n' "$OPTARG" >&2
+                printf '%s\n' "$HELP_HINT" >&2
+                return 1
+                ;;
+            \?)
+                [[ -n $OPTARG ]] && \
+                    printf 'invalid option: -%s\n' "$OPTARG" >&2
+                printf '%s\n' "$HELP_HINT" >&2
+                return 1
                 ;;
             *)
-                getopts_printError "$opt" "$OPTARG"
-                echo "$STRING_HELP_INFO"
-                exit 1
+                printf 'unexpected error\n' >&2
+                return 1
                 ;;
         esac
     done
     shift $(( OPTIND - 1 ))
 
-    if (( ! $# )); then
-        echo "requires a task"
-        echo "$STRING_HELP_INFO"
-        exit 1
-    fi
+    (( $# )) || {
+        printf 'command is required\n' >&2
+        printf '%s\n' "$HELP_HINT" >&2
+        return 1
+    }
 
-    local -r SCRIPT_ROOT=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
+    local cmd=$1
+    shift
 
-    local task=$1
-    case $task in
+    case $cmd in
         all)
-            installBashConfig "$SCRIPT_ROOT"
-            installNeovimConfig "$SCRIPT_ROOT"
-            checkNeovimPackage
-            exit 0
+            install_bash_config
+            install_neovim_config
+            check_neovim_requirements
+            return 0
             ;;
         bashrc)
-            installBashConfig "$SCRIPT_ROOT"
-            exit 0
+            install_bash_config
+            return 0
             ;;
         neovim-config)
-            installNeovimConfig "$SCRIPT_ROOT"
-            exit 0
+            install_neovim_config
+            return 0
             ;;
         neovim-check)
-            checkNeovimPackage
-            exit 0
+            check_neovim_requirements
+            return 0
             ;;
         help)
-            echo "$STRING_HELP"
-            exit 0
+            printf '%s\n' "$HELP_MAIN"
+            return 0
             ;;
         *)
-            echo "invalid task: $task"
-            echo "$STRING_HELP_INFO"
-            exit 1
+            printf 'invalid command: %s\n' "$cmd" >&2
+            printf '%s\n' "$HELP_HINT" >&2
+            return 1
             ;;
     esac
 }
