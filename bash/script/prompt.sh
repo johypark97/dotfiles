@@ -15,9 +15,9 @@ declare -gA _dotfiles_prompt_var=(
 _dotfiles_prompt_set_default_umask()
 {
     local value=$1
-    [[ $value =~ ^[0-7]{1,3}$ ]] || return 1
-    value=00$value
-    _dotfiles_prompt_var[default_umask]=${value: -3}
+    [[ $value =~ ^[0-7]{1,4}$ ]] || return 1
+    value=000$value
+    _dotfiles_prompt_var[default_umask]=${value: -4}
 }
 
 _dotfiles_prompt_set_terminal_color()
@@ -114,7 +114,7 @@ _dotfiles_prompt_command_info()
     local current_umask
     current_umask=$( umask )
     (( current_umask != _dotfiles_prompt_var[default_umask] )) && \
-        array+=( "${current_umask:1}(${_dotfiles_prompt_var[default_umask]})" )
+        array+=( "$current_umask(${_dotfiles_prompt_var[default_umask]})" )
 
     # print
     (( ${#array} )) || return 1

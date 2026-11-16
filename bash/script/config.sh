@@ -10,7 +10,9 @@ shopt -s histappend
 
 # path
 if [[ $OSTYPE == linux-gnu ]]; then
-    _dotfiles_prepend_path "$HOME/.local/bin"
+    if [[ -d $HOME/.cargo/bin ]]; then
+        _dotfiles_prepend_path "$HOME/.cargo/bin"
+    fi
 
     if command -v npm > /dev/null; then
         _dotfiles_prepend_path "$( npm config get prefix )/bin"
@@ -18,8 +20,8 @@ if [[ $OSTYPE == linux-gnu ]]; then
 fi
 
 # umask
-umask 007
-_dotfiles_prompt_set_default_umask 007
+umask 0007
+_dotfiles_prompt_set_default_umask 0007
 
 # prompt
 if (( $( tput colors 2>/dev/null ) >= 8 )); then
