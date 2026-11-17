@@ -20,8 +20,8 @@ if [[ $OSTYPE == linux-gnu ]]; then
 fi
 
 # umask
-umask 0007
-_dotfiles_prompt_set_default_umask 0007
+umask 0027
+_dotfiles_prompt_set_default_umask 0027
 
 # prompt
 if (( $( tput colors 2>/dev/null ) >= 8 )); then
