@@ -105,7 +105,7 @@ _dotfiles_parse_tag_callback()
 
 _dotfiles_prompt_command_info()
 {
-    local -a array=()
+    local -a array
 
     # newgrp info
     (( $( id -u ) != $( id -g ) )) && array+=( "$( id -gn )" )

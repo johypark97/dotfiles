@@ -8,6 +8,15 @@ HISTSIZE=1024
 shopt -s checkwinsize
 shopt -s histappend
 
+# color
+if command -v dircolors > /dev/null; then
+    if [[ -r ~/.dircolors ]]; then
+        eval "$( dircolors -b ~/.dircolors )"
+    else
+        eval "$( dircolors -b )"
+    fi
+fi
+
 # path
 if [[ $OSTYPE == linux-gnu ]]; then
     if [[ -d $HOME/.cargo/bin ]]; then
