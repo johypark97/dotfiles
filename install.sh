@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: # enable line-specific shellcheck suppression
+: # for line-specific ShellCheck suppression
 
 # shellcheck disable=SC2155
 readonly SCRIPT_ROOT=$( dirname "$( realpath "${BASH_SOURCE[0]}" )" )
@@ -29,7 +29,7 @@ confirm_yes_no()
 {
     local prompt=${1:?prompt is required}
     while :; do
-        read -erp "$prompt (y/N): " value
+        read -erp "$prompt (y/N): " value || return 1
         local value=${value:-N}
         case $value in
             Y | y) return 0 ;;
@@ -39,40 +39,54 @@ confirm_yes_no()
     done
 }
 
+dpkg_is_installed() {
+    [[ -n ${1-} ]] || return 1
+    local status
+    status=$( dpkg-query -W -f='${Status}' "$1" 2>/dev/null ) || return 1
+    [[ $status == "install ok installed" ]]
+}
+
+trim() {
+    local x=${1?argument is required}
+    x=${x#"${x%%[![:space:]]*}"}
+    x=${x%"${x##*[![:space:]]}"}
+    printf '%s' "$x"
+}
+
 is_symbolic_link_of()
 {
-    local -r LINK_PATH=${1:?link path is required}
-    local -r TARGET_PATH=${2:?target path is required}
+    local link_path=${1:?link path is required}
+    local target_path=${2:?target path is required}
 
-    [[ -L $LINK_PATH ]] || return 1
+    [[ -L $link_path ]] || return 1
 
     local path
-    path=$( readlink "$LINK_PATH" ) || {
-        printf 'failed to read link path: %s\n' "$LINK_PATH" >&2
+    path=$( readlink "$link_path" ) || {
+        printf 'failed to read link path: %s\n' "$link_path" >&2
         return 1
     }
 
-    [[ $path == "$TARGET_PATH" ]]
+    [[ $path == "$target_path" ]]
 }
 
 create_or_replace_symbolic_link()
 {
-    local -r LINK_PATH=${1:?link path is required}
-    local -r TARGET_PATH=${2:?target path is required}
+    local link_path=${1:?link path is required}
+    local target_path=${2:?target path is required}
 
-    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
+    if [[ -e $link_path || -L $link_path ]]; then
         printf 'removing old file... '
-        rm "$LINK_PATH" || return 1
+        rm "$link_path" || return 1
         printf 'done\n'
     fi
 
     printf 'creating new symbolic link... '
 
     local dir_path
-    dir_path=$( dirname "$LINK_PATH" ) || return 1
+    dir_path=$( dirname "$link_path" ) || return 1
 
     mkdir -p "$dir_path" || return 1
-    ln -s "$TARGET_PATH" "$LINK_PATH" || return 1
+    ln -s "$target_path" "$link_path" || return 1
 
     printf 'done\n'
 
@@ -80,81 +94,132 @@ create_or_replace_symbolic_link()
 
 install_bash_config()
 {
-    local -r LINK_PATH=$HOME/.bashrc
-    local -r TARGET_PATH=$SCRIPT_ROOT/bash/bashrc
+    local link_path=$HOME/.bashrc
+    local target_path=$SCRIPT_ROOT/bash/bashrc
 
     printf 'Installing .bashrc\n'
 
-    if is_symbolic_link_of "$LINK_PATH" "$TARGET_PATH"; then
+    if is_symbolic_link_of "$link_path" "$target_path"; then
         printf '.bashrc is already installed.\n'
         return 0
     fi
 
-    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
-        printf '.bashrc is already exists: %s\n' "$LINK_PATH"
+    if [[ -e $link_path || -L $link_path ]]; then
+        printf '.bashrc is already exists: %s\n' "$link_path"
         confirm_yes_no "Do you want to overwrite it?" || return 0
     fi
 
-    create_or_replace_symbolic_link "$LINK_PATH" "$TARGET_PATH" || return 0
+    create_or_replace_symbolic_link "$link_path" "$target_path" || return 0
 
-    printf '.bashrc installed: %s\n' "$LINK_PATH"
+    printf '.bashrc installed: %s\n' "$link_path"
 }
 
 install_neovim_config()
 {
-    local -r LINK_PATH=$HOME/.config/nvim/init.lua
-    local -r TARGET_PATH=$SCRIPT_ROOT/neovim/init.lua
+    local link_path=$HOME/.config/nvim/init.lua
+    local target_path=$SCRIPT_ROOT/neovim/init.lua
 
     printf 'Installing Neovim config\n'
 
-    if is_symbolic_link_of "$LINK_PATH" "$TARGET_PATH"; then
+    if is_symbolic_link_of "$link_path" "$target_path"; then
         printf 'Neovim config is already installed.\n'
         return 0
     fi
 
-    if [[ -e $LINK_PATH || -L $LINK_PATH ]]; then
-        printf 'Neovim config is already exists: %s\n' "$LINK_PATH"
+    if [[ -e $link_path || -L $link_path ]]; then
+        printf 'Neovim config is already exists: %s\n' "$link_path"
         confirm_yes_no "Do you want to overwrite it?" || return 0
     fi
 
-    create_or_replace_symbolic_link "$LINK_PATH" "$TARGET_PATH" || return 0
+    create_or_replace_symbolic_link "$link_path" "$target_path" || return 0
 
-    printf 'Neovim config installed: %s\n' "$LINK_PATH"
+    printf 'Neovim config installed: %s\n' "$link_path"
+}
+
+is_requirement_installed()
+{
+    local target_field_width=${1:?target field width is required}
+    local requirement_line=${2:?requirement line is required}
+
+    local -a fields
+    IFS=, read -ra fields <<< "$requirement_line"
+
+    (( ${#fields[@]} == 3 )) || {
+        printf 'invalid format: requirement line\n' >&2
+        return 1
+    }
+
+    local i
+    for i in "${!fields[@]}"; do
+        fields[i]=$( trim "${fields[i]}" )
+    done
+
+    local type=${fields[0]}
+    local target=${fields[1]}
+    local install=${fields[2]}
+
+    printf "%${target_field_width}s %s: " "$target" "$type"
+    case "$type" in
+        command)
+            if command -v "$target" > /dev/null; then
+                printf 'OK.\n'
+            else
+                printf 'Not found. %s\n' "$install"
+            fi
+            ;;
+        package)
+            if dpkg_is_installed "$target"; then
+                printf 'OK.\n'
+            else
+                printf 'Not installed. %s\n' "$install"
+            fi
+            ;;
+    esac
 }
 
 check_neovim_requirements()
 {
-    local -Ar MAP=(
-        [curl]=curl
-        [gzip]=gzip
-        [node]=nodejs
-        [npm]=npm
-        [python3]=python3
-        [tar]=tar
-        [tree-sitter]="tree-sitter-cli (npm)"
-        [unzip]=unzip
-        [wget]=wget
+    local -r TARGET_FIELD_WIDTH=16
+
+    local -ra REQUIRED=(
+        # type    target       install
+        "command, git,         Please install the 'git' package using apt."
+
+        "command, curl,        Please install the 'curl' package using apt."
+        "command, wget,        Please install the 'wget' package using apt."
+
+        "command, tar,         Please install the 'tar' package using apt."
+        "command, gzip,        Please install the 'gzip' package using apt."
+        "command, unzip,       Please install the 'unzip' package using apt."
+
+        "command, python3,     Please install the 'python3' package using apt."
+
+        "command, node,        Please install the 'nodejs' package using apt."
+        "command, npm,         Please install the 'npm' package using apt."
+        "command, tree-sitter, Please install the 'tree-sitter-cli' package using npm."
     )
 
-    local width=0
+    local -ra OPTIONAL=(
+        # type    target         install
+        "command, clangd,        Please install the 'clangd' package using apt."
+        "command, clang-format,  Please install the 'clang-format' package using apt."
 
-    local key
-    for key in "${!MAP[@]}"; do
-        local x=${#key}
-        (( x > width )) && width=$x
-    done
-    (( width += 4 ))
+        "command, cargo,         Please install 'rust' form https://rust-lang.org/"
+        "command, rust-analyzer, Please install 'rust-analyzer' using the command 'rustup component add rust-analyzer'."
+
+        "command, pip,           Please install the 'python3-pip' package using apt."
+        "package, python3-venv,  Please install the 'python3-venv' package using apt."
+    )
+
+    local line
 
     printf 'Checking Neovim requirements:\n'
-    for key in "${!MAP[@]}"; do
-        local value=${MAP[$key]}
-
-        printf "%${width}s command: " "$key"
-        if command -v "$key" > /dev/null; then
-            printf 'OK.\n'
-        else
-            printf 'Not found. Please install the %s package.\n' "'$value'"
-        fi
+    for line in "${REQUIRED[@]}"; do
+        is_requirement_installed "$TARGET_FIELD_WIDTH" "$line" || return 1
+    done
+    printf 'Checking optional requirements:\n'
+    for line in "${OPTIONAL[@]}"; do
+        is_requirement_installed "$TARGET_FIELD_WIDTH" "$line" || return 1
     done
 
     printf '%s\n' "For more information, please run the ':checkhealth' command in Neovim."
