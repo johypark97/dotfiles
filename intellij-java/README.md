@@ -1,9 +1,9 @@
 # GoogleStyle (Custom)
 
-My custom code style scheme used in IntelliJ IDEA.
+My old custom code style scheme used in IntelliJ IDEA.
 
 - Base scheme: [intellij-java-google-style.xml](intellij-java-google-style.xml) from ~~[google/styleguide](https://github.com/google/styleguide)~~
-  - The XML file was removed due to the release of the official plugin.
+  - The XML file was removed from the repository due to the release of the official plugin.
 - Exported from: IntelliJ IDEA 2026.3.0.1
 
 ## Customizations
