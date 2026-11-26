@@ -1,9 +1,10 @@
 # GoogleStyle (Custom)
 
-This is my custom code style scheme used in IntelliJ IDEA.
+My custom code style scheme used in IntelliJ IDEA.
 
-- Base scheme: [Google Java Style](https://github.com/google/styleguide) (intellij-java-google-style.xml)
-- Exported from: IntelliJ IDEA 2026.1.2
+- Base scheme: [intellij-java-google-style.xml](intellij-java-google-style.xml) from ~~[google/styleguide](https://github.com/google/styleguide)~~
+  - The XML file was removed due to the release of the official plugin.
+- Exported from: IntelliJ IDEA 2026.3.0.1
 
 ## Customizations
 
@@ -52,6 +53,7 @@ This is my custom code style scheme used in IntelliJ IDEA.
 
 - Arrangement
   - Grouping rules:
+    - [ ] Keep getters and setters together
     - [x] Keep overridden methods together: keep order
   - Rules Alias Definitions
     - method_visibility
